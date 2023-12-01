@@ -11,6 +11,9 @@ def chat():
     # Extract data from request
     data = request.json
 
+    tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium", padding_side='left')
+    model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
+
     input_prompt = data['prompt']
     chat_history_ids = data['chat_history_ids']
 
@@ -36,7 +39,4 @@ def chat():
 
 
 if __name__ == '__main__':
-    tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium", padding_side='left')
-    model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
-
     app.run(debug=True, host='0.0.0.0', port=5000)
