@@ -132,13 +132,15 @@ def chat():
         preprocessed_input = pre_processing(input_prompt)
 
         res = search_results([BOOKS_MAP[0]], preprocessed_input)
-
+        print("results here")
+        print(res)
         if not res:
             jsonify({
                 'output': "No results found!! Try again",
                 'farewell': False,
                 'chit_chat': False
             })
+
         doc_string = ''
 
         for msg in prev_msgs:
