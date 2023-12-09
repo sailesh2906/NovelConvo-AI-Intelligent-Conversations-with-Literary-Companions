@@ -67,9 +67,12 @@ def search_results(books, query):
         response.raise_for_status()  # Raises an HTTPError for bad responses
         data = response.json()['response']['docs']
         results_df = pd.DataFrame(data)
-        print(results_df)
-        results_df.drop(columns=['id', '_version_'], inplace=True)
-        return results_df
+        if results_df:
+            results_df.drop(columns=['id', '_version_'], inplace=True)
+            return results_df
+        else:
+            print("No results found")
+            return pd.DataFrame()
     except requests.RequestException as e:
         print(f"An error occurred: {e}")
         return pd.DataFrame()  # Return an empty DataFrame in case of an error
@@ -130,6 +133,12 @@ def chat():
 
         res = search_results([BOOKS_MAP[0]], preprocessed_input)
 
+        if not res:
+            jsonify({
+                'output': "No results found!! Try again",
+                'farewell': False,
+                'chit_chat': False
+            })
         doc_string = ''
 
         for msg in prev_msgs:
