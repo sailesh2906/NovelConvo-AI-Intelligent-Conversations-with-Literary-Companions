@@ -8,6 +8,7 @@ import botImage from './bot.png';
 import sendImage from './send.png';
 
 const LOCAL_URL = 'http://localhost:5000/chat';
+const CLOUD_URL = 'http://34.125.179.216:5000/chat';
 
 const PREV_MSG_COUNT = 5;
 
@@ -86,7 +87,7 @@ function ChatRoom() {
   const [books, setBooks] = useState(INIT_BOOKS)
   let [msgCounter, setMsgCounter] = useState(0);
 
-  const cloud_url = LOCAL_URL;
+  const cloud_url = CLOUD_URL;
 
   const sendMessage = async (e) => {
     setFormValue('');
