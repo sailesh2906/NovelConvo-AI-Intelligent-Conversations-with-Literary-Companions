@@ -2,7 +2,8 @@ import requests
 import json
 
 # The URL of the Flask app
-url = 'http://34.168.237.117:5000/chat'
+# url = 'http://34.168.237.117:5000/chat'
+url = 'http://localhost:5000/chat'
 
 # Initialize chat_history_ids to None for the first request
 chat_history_ids = None

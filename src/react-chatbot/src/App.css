@@ -4,7 +4,7 @@ body {
 
 .App {
   text-align: center;
-  max-width: 728px;
+  max-width: 1092px;
   margin: 0 auto;
 }
 
@@ -15,7 +15,7 @@ body {
   color: white;
   position: fixed;
   width: 100%;
-  max-width: 728px;
+  max-width: 1092px;
   top: 0;
   display: flex;
   align-items: center;
@@ -31,6 +31,30 @@ body {
   justify-content: center;
   min-height: 100vh;
   background-color: rgb(40, 37, 53);
+}
+
+.flex-container {
+  display: flex;
+}
+
+.flex-child {
+  flex: 1;
+}  
+
+.flex-child:first-child {
+  flex: 0.5;
+  border-right: 2px solid grey;
+  padding: 10px;
+  margin: 10vh 0 10vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-checkbox {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  padding: 5px;
 }
 
 main {
@@ -71,7 +95,7 @@ form button {
 }
 
 
-input {
+.typebox {
   line-height: 1.5;
   width: 100%;
   font-size: 1.5rem;
@@ -80,6 +104,11 @@ input {
   outline: none;
   border: none;
   padding: 0 10px;
+}
+
+.checkbox-label {
+  color: white;
+  font-size: 1rem;
 }
 
 button {
