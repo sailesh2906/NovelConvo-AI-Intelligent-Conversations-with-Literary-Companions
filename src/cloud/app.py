@@ -17,6 +17,10 @@ CLASSIFIER_URL = 'http://34.168.52.156:5000/classify'
 CHITCHAT_URL = 'http://34.168.123.224:5000/chat'
 RAG_URL = 'http://34.125.217.36:5000/rag'
 
+CHAT_VAL = "chat"
+FAREWELL_VAL = "bye"
+NOVELS_VAL = "novels"
+
 BOOKS_MAP = {
     0: "The Adventures of Sherlock Holmes",
     1: "Romeo and Juliet",
@@ -90,7 +94,7 @@ def chat():
     print(books)
     response = requests.post(CLASSIFIER_URL, json={
         'sequence_to_classify': input_prompt,
-        'candidate_labels': ['chat', 'novels']
+        'candidate_labels': [CHAT_VAL, NOVELS_VAL, FAREWELL_VAL]
     })
 
     classifier_data = response.json()
@@ -98,15 +102,15 @@ def chat():
     classifier_output = classifier_data['label']
     print(classifier_output)
 
-    if classifier_output == 'chat':
-        response = requests.post(CLASSIFIER_URL, json={
-            'sequence_to_classify': input_prompt,
-            'candidate_labels': ['farewell', 'not farewell']
-        })
-        farewell_data = response.json()
-        farewell_output = farewell_data['label']
-
-        print(farewell_output)
+    if classifier_output != NOVELS_VAL:
+        # response = requests.post(CLASSIFIER_URL, json={
+        #     'sequence_to_classify': input_prompt,
+        #     'candidate_labels': ['farewell', 'not farewell']
+        # })
+        # farewell_data = response.json()
+        # farewell_output = farewell_data['label']
+        #
+        # print(farewell_output)
 
         response = requests.post(CHITCHAT_URL, json={
             'prompt': input_prompt,
@@ -114,7 +118,7 @@ def chat():
         cc_data = response.json()
         return jsonify({
             'output': cc_data['output'],
-            'farewell': farewell_output == 'farewell',
+            'farewell': classifier_output == FAREWELL_VAL,
             'chit_chat': True
         })
     else:
