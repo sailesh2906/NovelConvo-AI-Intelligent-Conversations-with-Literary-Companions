@@ -89,7 +89,7 @@ function ChatRoom() {
   const cloud_url = LOCAL_URL;
 
   const sendMessage = async (e) => {
-
+    setFormValue('');
     try {
       const response = await axios.post(cloud_url, {
         prompt: formValue,
@@ -119,7 +119,6 @@ function ChatRoom() {
     //   photoURL
     // })
 
-    setFormValue('');
     dummy.current.scrollIntoView({ behavior: 'smooth' });
   }
   
