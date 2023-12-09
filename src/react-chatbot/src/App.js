@@ -198,7 +198,12 @@ function ChatRoom() {
     <div class="flex-child main">
       <main>
 
-        {messages && messages.map(msg => <ChatMessage key={`chat_${msg.id}`} message={msg} />)}
+        {messages && messages.map(msg => (
+          <ChatMessage
+            key={`chat_${msg.id}`}
+            message={msg}
+          />
+          ))}
 
         <span ref={dummy}></span>
 
@@ -225,14 +230,17 @@ function ChatRoom() {
 
 
 function ChatMessage(props) {
-  const { text, bot } = props.message;
+  const { text, bot, chitChat } = props.message;
 
   const messageClass = bot ? 'received': 'sent';
+
+  let title = "";
+  if (bot) title = chitChat ? "ChitChat": "Novels";
 
   return (<>
     <div className={`message ${messageClass}`}>
       <img src={bot ? botImage : manImage} alt="Icon" />
-      <p>{text}</p>
+      <p title={title}>{text}</p>
     </div>
   </>)
 }

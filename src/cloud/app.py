@@ -67,6 +67,7 @@ def search_results(books, query):
         response.raise_for_status()  # Raises an HTTPError for bad responses
         data = response.json()['response']['docs']
         results_df = pd.DataFrame(data)
+        print(results_df)
         results_df.drop(columns=['id', '_version_'], inplace=True)
         return results_df
     except requests.RequestException as e:
