@@ -86,6 +86,7 @@ function ChatRoom() {
   const [messages, addMessage] = useState([]);
   const [books, setBooks] = useState(INIT_BOOKS)
   let [msgCounter, setMsgCounter] = useState(0);
+  const [sessionEnded, setSessionEnded] = useState(false);
 
   const cloud_url = CLOUD_URL;
 
@@ -107,6 +108,10 @@ function ChatRoom() {
           chitChat : response.data.chit_chat
         }
       ]));
+      
+      if (response.data.farewell) {
+        setSessionEnded(true)
+      }
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -185,6 +190,7 @@ function ChatRoom() {
     setBooks(newBooks)
   }
 
+  const placeholder = sessionEnded ? "Session Ended!! Bye" : "wanna talk books"
   return (<div class="flex-container">
     <div class="flex-child filters">
       {books.map(book => <Checkbox key={`checkbox_book_${book.bookId}`} label={book.bookName} isChecked={book.checked} onChange={() => onToggleCheck(book.bookId)}/>)}
@@ -199,9 +205,15 @@ function ChatRoom() {
       </main>
 
       <form onSubmit={onClickSend}>
-        <input className = "typebox" value={formValue} onChange={(e) => onType(e.target.value)} placeholder="wanna talk books" />
+        <input 
+          className = "typebox"
+          value={formValue}
+          onChange={(e) => onType(e.target.value)}
+          placeholder={placeholder}
+          disabled={sessionEnded}
+        />
 
-        <button type="submit" disabled={!formValue}>{
+        <button type="submit" disabled={!formValue || sessionEnded}>{
           <img src={sendImage} alt="Icon" />
         }</button>
 
