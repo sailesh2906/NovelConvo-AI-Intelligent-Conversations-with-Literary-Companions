@@ -1,4 +1,5 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+
 import axios from 'axios';
 
 import './App.css';
@@ -89,6 +90,10 @@ function ChatRoom() {
   const [sessionEnded, setSessionEnded] = useState(false);
   const [waitForResponse, setWaitForResponse] = useState(false);
 
+  useEffect(() => {
+    dummy.current.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   const cloud_url = CLOUD_URL;
 
   const sendMessage = async (e) => {
@@ -111,7 +116,6 @@ function ChatRoom() {
       ]));
       setWaitForResponse((waitForResponse) => !waitForResponse)
       setMsgCounter((msgCounter) => (msgCounter += 1))
-      dummy.current.scrollIntoView({ behavior: 'smooth' });
       
       if (response.data.farewell) {
         setSessionEnded(true)
@@ -119,15 +123,6 @@ function ChatRoom() {
     } catch (error) {
       console.error('Error sending message:', error);
     }
-
-    // const { uid, photoURL } = auth.currentUser;
-
-    // await messagesRef.add({
-    //   text: formValue,
-    //   createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    //   uid,
-    //   photoURL
-    // })
   }
   
   const getBooksToSend = () => {
@@ -191,11 +186,8 @@ function ChatRoom() {
     setBooks(newBooks)
   }
 
-  let placeholder = "wanna talk books";
-
-  if (waitForResponse) placeholder = "Bot typing..."
-  if (sessionEnded) placeholder = "Session Ended!! Bye"
-
+  const placeholder = sessionEnded ? "Session Ended!! Bye" : "Wanna talk books??";
+  const typingLabel = waitForResponse ? "Bot Typing..." : ""
   return (
   <div className="flex-container">
     <div className="flex-child filters">
@@ -214,7 +206,7 @@ function ChatRoom() {
         <span ref={dummy}></span>
 
       </main>
-
+      <label className="typing-label">{typingLabel}</label>
       <form onSubmit={onClickSend}>
         <input 
           className = "typebox"
