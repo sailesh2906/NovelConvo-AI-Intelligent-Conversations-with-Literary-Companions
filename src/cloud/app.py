@@ -19,9 +19,9 @@ CLASSIFIER_URL = 'http://34.168.52.156:5000/classify'
 CHITCHAT_URL = 'http://34.168.123.224:5000/chat'
 RAG_URL = 'http://34.125.217.36:5000/rag'
 
-CHAT_VAL = "Continuing Conversation"
+CHAT_VAL = "Initialing or Continuing Conversation"
 FAREWELL_VAL = "Concluding Conversation"
-NOVELS_VAL = "Novels, Books, Fiction"
+NOVELS_VAL = "Seeking Information on Novels"
 
 BOOKS_MAP = {
     0: "The Adventures of Sherlock Holmes",
