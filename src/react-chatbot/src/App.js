@@ -6,6 +6,7 @@ import './App.css';
 import Analytics from './Analytics';
 import ChatRoom from './ChatRoom';
 import analyticsImage from './analytics.png';
+import botImage from './bot.png';
 
 
 import generateSessionId from './util';
@@ -18,12 +19,17 @@ function App() {
   };
 
   const sessionId = generateSessionId();
+  const buttonTitle = chatMode ? "Go to Analytics" : "Go back to Chatbot"
   return (
     <div className="App">
       <header className="App-header">
         <h1>Query Alchemist 💬</h1>
-        <button type="submit" onClick={toggleChatMode}>{
-          <img src={analyticsImage} alt="Icon" />
+        <button
+         type="submit"
+         onClick={toggleChatMode}
+         title={buttonTitle}
+         >{
+          <img src={chatMode ? analyticsImage: botImage} alt="Icon" />
         }</button>
       </header>
 

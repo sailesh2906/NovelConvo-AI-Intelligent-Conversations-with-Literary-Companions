@@ -16,7 +16,7 @@ function Analytics() {
   
     useEffect(()  => {
       fetchAnalytics();
-    }, [])
+    }, []);
   
     const fetchAnalytics = async () => {
       try {
