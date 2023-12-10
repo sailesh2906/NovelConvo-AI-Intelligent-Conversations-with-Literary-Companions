@@ -135,18 +135,20 @@ def chat():
                 'chit_chat': True
             })
 
+    book_titles = []
     if not books:
         topic_classifier_output = classify(
             input_prompt,
             list(BOOKS_MAP.values())
         )
         print(topic_classifier_output)
-        books = [topic_classifier_output]
+        book_titles = [topic_classifier_output]
+    else:
+        book_titles = [BOOKS_MAP[book] for book in books]
 
     preprocessed_input = pre_processing(input_prompt)
 
-    res = search_results(books, preprocessed_input)
-    print("results here")
+    res = search_results(book_titles, preprocessed_input)
     print(res)
     if res.empty:
         jsonify({
