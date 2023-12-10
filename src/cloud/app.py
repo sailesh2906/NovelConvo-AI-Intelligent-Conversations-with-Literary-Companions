@@ -120,6 +120,7 @@ def chat():
         [CHAT_VAL, NOVELS_VAL, FAREWELL_VAL]
     )
 
+    print(classifier_output)
     if classifier_output != NOVELS_VAL:
         response = requests.post(CHITCHAT_URL, json={
             'prompt': input_prompt,
