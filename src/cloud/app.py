@@ -148,29 +148,25 @@ def chat():
 
     preprocessed_input = pre_processing(input_prompt)
 
-    res = search_results(book_titles, preprocessed_input)
-    print(res)
-    if res.empty:
-        jsonify({
-            'output': "No results found!! Try again",
-            'farewell': False,
-            'chit_chat': False
-        })
+    doc_df = search_results(book_titles, preprocessed_input)
+    print(doc_df)
 
     doc_string = ''
 
-    for msg in prev_msgs:
-        doc_string += (msg + ' /n ')
+    # for msg in prev_msgs:
+    #     doc_string += (msg + ' /n ')
 
-    for i in range(5):
-        doc_string += (res.paragraph[i] + ' /n ')
+    if not doc_df.empty:
+        for i in range(min(5, doc_df.shape[0])):
+            doc_string += (doc_df.paragraph[i] + ' /n ')
 
     response = requests.post(RAG_URL, json={
         'query': input_prompt,
         'docs': doc_string
     })
-    print(response.status_code)
+
     rag_data = response.json()
+
     return jsonify({
         'output': rag_data['answer'],
         'farewell': False,
