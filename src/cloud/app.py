@@ -158,6 +158,13 @@ def chat():
     # for msg in prev_msgs:
     #     doc_string += (msg + ' /n ')
 
+    if books and doc_df.empty:
+        return jsonify({
+            'output': "No results found!! Try changing filters",
+            'farewell': False,
+            'chit_chat': False
+        })
+
     if not doc_df.empty:
         for i in range(min(5, doc_df.shape[0])):
             doc_string += (doc_df.paragraph[i] + ' /n ')
