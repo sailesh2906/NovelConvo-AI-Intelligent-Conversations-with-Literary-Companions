@@ -15,7 +15,6 @@ nltk.download('wordnet')
 app = Flask(__name__)
 CORS(app)
 
-CLASSIFIER_URL = 'http://34.168.52.156:5000/classify'
 CHITCHAT_URL = 'http://34.168.123.224:5000/chat'
 RAG_URL = 'http://34.125.217.36:5000/rag'
 
