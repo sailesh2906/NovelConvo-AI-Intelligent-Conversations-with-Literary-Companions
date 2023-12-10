@@ -2,11 +2,14 @@
 import React from 'react';
 import Plot from 'react-plotly.js';
 
-const BarGraph = ({ data, layout }) => {
+import { BOOKS_MAP } from './constants';
+
+const BarGraph = ({ data, layout , subBooks}) => {
+  // console.log(data)
   const chartData = [
     {
-      x: data ? data[0].x : [],
-      y: data ? data[0].y : [],
+      x: data ? data.x.map((i) => subBooks ? BOOKS_MAP[i] : i) : [],
+      y: data ? data.y : [],
       type: 'bar',
       marker: {
         color: 'rgba(75,192,192,0.6)',

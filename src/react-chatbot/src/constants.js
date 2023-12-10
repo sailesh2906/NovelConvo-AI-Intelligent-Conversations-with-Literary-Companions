@@ -57,3 +57,16 @@ export const INIT_BOOKS = [
     'checked': false
   }
 ]
+
+export const BOOKS_MAP = {
+  0: "The Adventures of Sherlock Holmes",
+  1: "Romeo and Juliet",
+  2: "The Iliad",
+  3: "Gulliver's Travels",
+  4: "Moby Dick",
+  5: "Hervey Willetts",
+  6: "Babbitt",
+  7: "Dracula",
+  8: "Adventures of Huckleberry Finn",
+  9: "The Alchemist"
+}

@@ -6,7 +6,7 @@ import './App.css';
 
 import TimeSeriesChart from './TimeSeriesChart';
 import BarGraph from './BarGraph';
-import { CLOUD_URL, INIT_BOOKS, ANALYTICS_ENDPOINT } from './constants';
+import { CLOUD_URL, ANALYTICS_ENDPOINT } from './constants';
 
 
 
@@ -25,9 +25,11 @@ function Analytics() {
       } catch (error) {
         console.error('Error sending message:', error);
       }
+
     };
+
     const graphWidth = "500"
-    const graphHeight = "360"
+    const graphHeight = "260"
     return(
       <div className='analytics-container'>
         <div className='analytics-item'>
@@ -49,7 +51,7 @@ function Analytics() {
         </div>
         <div className='analytics-item'>
           <BarGraph
-            data={analytics && analytics.response_distribution.data} 
+            data={analytics && analytics.response_distribution.data && analytics.response_distribution.data[0]} 
             layout = {{
               title: 'Response Type Distribution',
               xaxis: { title: 'Response Type' },
@@ -57,6 +59,7 @@ function Analytics() {
               width: graphWidth,
               height: graphHeight
             }}
+            subBooks={false}
           />
         </div>
         <div className='analytics-item'>
@@ -70,7 +73,7 @@ function Analytics() {
             </label>
         </div>      <div className='analytics-item'>
           <BarGraph
-            data={analytics && analytics.book_distribution.data} 
+            data={analytics && analytics.book_distribution.data && analytics.book_distribution.data[0]} 
             layout = {{
               title: 'Book Distribution',
               xaxis: { title: 'Book' },
@@ -78,11 +81,12 @@ function Analytics() {
               width: graphWidth,
               height: graphHeight
             }}
+            subBooks
           />
         </div>
         <div className='analytics-item'>
           <BarGraph
-            data={analytics && analytics.response_distribution.data} 
+            data={analytics && analytics.book_distribution.data && analytics.book_distribution.data[0]} 
             layout = {{
               title: 'Response Distribution',
               xaxis: { title: 'Response Type' },
@@ -90,6 +94,7 @@ function Analytics() {
               width: graphWidth,
               height: graphHeight
             }}
+            subBooks
           />
         </div>
       </div>
