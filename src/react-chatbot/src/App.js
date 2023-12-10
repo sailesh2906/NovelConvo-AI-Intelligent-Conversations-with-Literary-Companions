@@ -13,8 +13,10 @@ import SimpleHistogram from './SimpleHistogram';
 import generateSessionId from './util';
 
 
-const LOCAL_URL = 'http://localhost:5000/chat';
-const CLOUD_URL = 'http://34.125.179.216:5000/chat';
+const CLOUD_URL = 'http://34.125.179.216:5000'
+
+const CHAT_ENDPOINT = '/chat'
+const ANALYTICS_ENDPOINT = '/analytics'
 
 const PREV_MSG_COUNT = 5;
 
@@ -96,23 +98,14 @@ function App() {
 }
 
 function Analytics() {
-  // const sendMessage = async (e) => {
+  const analytics_url = CLOUD_URL + ANALYTICS_ENDPOINT;
+  const [analytics, setAnalytics] = useState({});
+
+
+  // const fetchAnalytics = async (e) => {
   //   try {
-  //     const response = await axios.post(cloud_url, {
-  //       prompt: formValue,
-  //       books: getBooksToSend(),
-  //       prev_msgs: getPrevMessages(),
-  //       conversation_id: sessionId
-  //     });
-  //     addMessage((messages) => ([
-  //       ...messages,
-  //       {
-  //         text: response.data.output,
-  //         bot: true,
-  //         id: msgCounter + 1,
-  //         chitChat : response.data.chit_chat
-  //       }
-  //     ]));
+  //     const response = await axios.get(analytics_url);
+  //     setAnalytics();
   //     setWaitForResponse((waitForResponse) => !waitForResponse)
   //     setMsgCounter((msgCounter) => (msgCounter += 1))
       
@@ -145,13 +138,13 @@ function ChatRoom({ sessionId }) {
     dummy.current.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const cloud_url = CLOUD_URL;
+  const chat_url = CLOUD_URL + CHAT_ENDPOINT;
 
   const sendMessage = async (e) => {
     setFormValue('');
     setWaitForResponse((waitForResponse) => !waitForResponse)
     try {
-      const response = await axios.post(cloud_url, {
+      const response = await axios.post(chat_url, {
         prompt: formValue,
         books: getBooksToSend(),
         prev_msgs: getPrevMessages(),

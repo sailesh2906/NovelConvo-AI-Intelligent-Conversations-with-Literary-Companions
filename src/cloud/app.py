@@ -238,7 +238,7 @@ def chat():
     })
 
 
-@app.route('/plot_generator', methods=['GET'])
+@app.route('/analytics', methods=['GET'])
 def plot_generator():
     plot_data = {}
 
@@ -292,20 +292,24 @@ def plot_generator():
     }
     plot_data['book_distribution'] = book_distribution
 
-    # Calculate Accuracy
+    # Calcualte Accuracy
     cursor.execute("""
-        SELECT COUNT(*) FROM conversation_logs
-        WHERE original_book_id IS NOT NULL AND original_book_id = predicted_book_id;
-    """)
+                    SELECT COUNT(*) FROM conversation_logs
+                    WHERE original_book_id IS NOT NULL AND predicted_book_id IS NOT NULL AND original_book_id = predicted_book_id;
+                    """)
+
     matched = cursor.fetchall()[0][0]
 
     cursor.execute("""
-        SELECT COUNT(*) FROM conversation_logs
-        WHERE original_book_id IS NOT NULL;
-    """)
+                    SELECT COUNT(*) FROM conversation_logs
+                    WHERE original_book_id IS NOT NULL AND predicted_book_id IS NOT NULL;
+                    """)
     total = cursor.fetchall()[0][0]
+    book_classifier_accuracy = 0
 
-    book_classifier_accuracy = matched / total
+    if total != 0:
+        book_classifier_accuracy = matched / total
+
     plot_data['book_classifier_accuracy'] = book_classifier_accuracy
 
     # Response Type Distribution
