@@ -71,7 +71,7 @@ def search_results(books, query):
         response.raise_for_status()  # Raises an HTTPError for bad responses
         data = response.json()['response']['docs']
         results_df = pd.DataFrame(data)
-        if not results_df.empty:
+        if not data or not results_df.empty:
             results_df.drop(columns=['id', '_version_'], inplace=True)
             return results_df
         else:
