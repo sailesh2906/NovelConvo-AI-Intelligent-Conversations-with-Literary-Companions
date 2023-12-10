@@ -333,9 +333,10 @@ def plot_generator():
     plot_data['response_distribution'] = response_distribution
 
     cursor.execute("""
-                   SELECT solar_documents_return_count, COUNT(*) as Frequency
-                    FROM conversation_logs
-                    GROUP BY solar_documents_return_count;
+                    SELECT original_book_id, SUM(solar_documents_return_count) as Frequency
+                        FROM conversation_logs
+                        WHERE original_book_id IS NOT NULL
+                        GROUP BY original_book_id;
                    """)
     book_ids = []
     counts = []
@@ -349,7 +350,7 @@ def plot_generator():
         'layout': {'title': 'Solr distribution across Books'}
     }
 
-    plot_data['solr_documents_distribution_across_booksistribution'] = solr_documents_distribution_across_books
+    plot_data['solr_documents_distribution_across_book_distribution'] = solr_documents_distribution_across_books
 
     cursor.execute("""
                    SELECT AVG(SumOfDocuments) as AvgDocumentsPerConversation

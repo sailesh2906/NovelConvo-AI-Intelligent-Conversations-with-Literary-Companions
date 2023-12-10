@@ -29,7 +29,7 @@ function Analytics() {
     };
 
     const graphWidth = "500"
-    const graphHeight = "320"
+    const graphHeight = "270"
     return(
       <div className='analytics-container'>
         <div className='analytics-item'>
@@ -97,7 +97,7 @@ function Analytics() {
         </div>
         <div className='analytics-item'>
           <BarGraph
-            data={analytics && analytics.solr_documents_distribution_across_booksistribution.data && analytics.solr_documents_distribution_across_booksistribution.data[0]} 
+            data={analytics && analytics.solr_documents_distribution_across_book_distribution.data && analytics.solr_documents_distribution_across_book_distribution.data[0]} 
             layout = {{
               title: 'Solr Document Retrived Distribution',
               xaxis: { title: 'Book' },
