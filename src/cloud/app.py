@@ -70,16 +70,16 @@ def search_results(books, query):
         response = requests.get(solr_url)
         response.raise_for_status()  # Raises an HTTPError for bad responses
         data = response.json()['response']['docs']
-        results_df = pd.DataFrame(data)
-        if not data or not results_df.empty:
+        if data:
+            results_df = pd.DataFrame(data)
             results_df.drop(columns=['id', '_version_'], inplace=True)
             return results_df
         else:
             print("No results found")
-            return False
+            return pd.DataFrame()
     except requests.RequestException as e:
         print(f"An error occurred: {e}")
-        return False
+        return pd.DataFrame()
 
 
 @app.route('/chat', methods=['POST'])
@@ -138,7 +138,7 @@ def chat():
         res = search_results([BOOKS_MAP[0]], preprocessed_input)
         print("results here")
         print(res)
-        if not res:
+        if res.empty:
             jsonify({
                 'output': "No results found!! Try again",
                 'farewell': False,
