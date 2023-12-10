@@ -71,7 +71,18 @@ function Analytics() {
             <label className="analytics-label">
                 {`Book Classifier Accuracy: ${analytics && analytics.book_classifier_accuracy}`}
             </label>
-        </div>      <div className='analytics-item'>
+        </div> 
+        <div className='analytics-item'>
+            <label className="analytics-label">
+                {`Average Solr Docs Retrieved per Session: ${analytics && analytics.average_number_of_solr_documents_fetched_in_a_session}`}
+            </label>
+        </div>
+        <div className='analytics-item'>
+            <label className="analytics-label">
+                {`Total Sessions Count: ${analytics && analytics.total_number_of_sessions}`}
+            </label>
+        </div>        
+        <div className='analytics-item'>
           <BarGraph
             data={analytics && analytics.book_distribution.data && analytics.book_distribution.data[0]} 
             layout = {{
@@ -86,10 +97,10 @@ function Analytics() {
         </div>
         <div className='analytics-item'>
           <BarGraph
-            data={analytics && analytics.book_distribution.data && analytics.book_distribution.data[0]} 
+            data={analytics && analytics.solr_documents_distribution_across_booksistribution.data && analytics.solr_documents_distribution_across_booksistribution.data[0]} 
             layout = {{
-              title: 'Response Distribution',
-              xaxis: { title: 'Response Type' },
+              title: 'Solr Document Retrived Distribution',
+              xaxis: { title: 'Book' },
               yaxis: { title: 'Total Count' },
               width: graphWidth,
               height: graphHeight
