@@ -87,11 +87,13 @@ function ChatRoom() {
   const [books, setBooks] = useState(INIT_BOOKS)
   let [msgCounter, setMsgCounter] = useState(0);
   const [sessionEnded, setSessionEnded] = useState(false);
+  const [waitForResponse, setWaitForResponse] = useState(false);
 
   const cloud_url = CLOUD_URL;
 
   const sendMessage = async (e) => {
     setFormValue('');
+    setWaitForResponse((waitForResponse) => !waitForResponse)
     try {
       const response = await axios.post(cloud_url, {
         prompt: formValue,
@@ -107,6 +109,7 @@ function ChatRoom() {
           chitChat : response.data.chit_chat
         }
       ]));
+      setWaitForResponse((waitForResponse) => !waitForResponse)
       setMsgCounter((msgCounter) => (msgCounter += 1))
       dummy.current.scrollIntoView({ behavior: 'smooth' });
       
@@ -188,7 +191,11 @@ function ChatRoom() {
     setBooks(newBooks)
   }
 
-  const placeholder = sessionEnded ? "Session Ended!! Bye" : "wanna talk books"
+  let placeholder = "wanna talk books";
+
+  if (waitForResponse) placeholder = "Bot typing..."
+  if (sessionEnded) placeholder = "Session Ended!! Bye"
+
   return (
   <div className="flex-container">
     <div className="flex-child filters">
@@ -214,7 +221,7 @@ function ChatRoom() {
           value={formValue}
           onChange={(e) => onType(e.target.value)}
           placeholder={placeholder}
-          disabled={sessionEnded}
+          disabled={sessionEnded || waitForResponse}
         />
 
         <button type="submit" disabled={!formValue || sessionEnded}>{
