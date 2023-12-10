@@ -10,11 +10,10 @@ import sendImage from './send.png';
 import { CLOUD_URL, INIT_BOOKS, CHAT_ENDPOINT, PREV_MSG_COUNT } from './constants';
 
 
-function ChatRoom({ sessionId }) {
+function ChatRoom({ sessionId, messages, addMessage }) {
     const dummy = useRef();
   
     const [formValue, setFormValue] = useState('');
-    const [messages, addMessage] = useState([]);
     const [books, setBooks] = useState(INIT_BOOKS)
     let [msgCounter, setMsgCounter] = useState(0);
     const [sessionEnded, setSessionEnded] = useState(false);

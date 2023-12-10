@@ -29,7 +29,7 @@ function Analytics() {
     };
 
     const graphWidth = "500"
-    const graphHeight = "260"
+    const graphHeight = "320"
     return(
       <div className='analytics-container'>
         <div className='analytics-item'>

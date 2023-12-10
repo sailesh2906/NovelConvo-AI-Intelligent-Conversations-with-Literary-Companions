@@ -13,7 +13,8 @@ import generateSessionId from './util';
 
 function App() {
   const [chatMode, setChatMode] = useState(true);
-  
+  const [messages, addMessage] = useState([]);
+
   const toggleChatMode = () => {
     setChatMode((chatMode) => !chatMode)
   };
@@ -34,7 +35,7 @@ function App() {
       </header>
 
       <section>
-        {chatMode ? <ChatRoom sessionId={sessionId}/> : <Analytics />}
+        {chatMode ? <ChatRoom sessionId={sessionId} messages={messages} addMessage={addMessage}/> : <Analytics />}
       </section>
     </div>
   );
