@@ -7,7 +7,9 @@ import './App.css';
 import manImage from './man.png';
 import botImage from './bot.png';
 import sendImage from './send.png';
+import analyticsImage from './analytics.png';
 
+import SimpleHistogram from './SimpleHistogram';
 const LOCAL_URL = 'http://localhost:5000/chat';
 const CLOUD_URL = 'http://34.125.179.216:5000/chat';
 
@@ -67,17 +69,34 @@ const INIT_BOOKS = [
 ]
 
 function App() {
+  const [chatMode, setChatMode] = useState(true);
+
+  const toggleChatMode = () => {
+    setChatMode((chatMode) => !chatMode)
+  };
   return (
     <div className="App">
       <header className="App-header">
         <h1>Query Alchemist 💬</h1>
+        <button type="submit" onClick={toggleChatMode}>{
+          <img src={analyticsImage} alt="Icon" />
+        }</button>
       </header>
 
       <section>
-        {<ChatRoom />}
+        {chatMode ? <ChatRoom /> : <Analytics />}
       </section>
     </div>
   );
+}
+
+function Analytics() {
+
+  return(
+    <>
+     <SimpleHistogram/>
+    </>
+  )
 }
 
 function ChatRoom() {
@@ -142,7 +161,6 @@ function ChatRoom() {
   
     const prevMessages = [];
     messages.slice(0).reverse().forEach(msg => {
-      console.log(msg)
       if (msg.bot && !msg.chitChat && cntr <= PREV_MSG_COUNT) {
         prevMessages.push(msg.text)
         cntr += 1
@@ -154,7 +172,6 @@ function ChatRoom() {
   }
 
   const onType = (val) => {
-    console.log(msgCounter)
     setFormValue(val)
   }
 
