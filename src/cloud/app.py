@@ -21,7 +21,7 @@ RAG_URL = 'http://34.125.217.36:5000/rag'
 
 CHAT_VAL = "Continuing Conversation"
 FAREWELL_VAL = "Concluding Conversation"
-NOVELS_VAL = "Seeking Information on Novels"
+NOVELS_VAL = "Novels, Books, Fiction"
 
 BOOKS_MAP = {
     0: "The Adventures of Sherlock Holmes",
@@ -121,6 +121,7 @@ def chat():
     )
 
     print(classifier_output)
+
     if classifier_output != NOVELS_VAL:
         response = requests.post(CHITCHAT_URL, json={
             'prompt': input_prompt,
@@ -135,13 +136,10 @@ def chat():
             })
 
     if not books:
-        print(list(BOOKS_MAP.values()))
-        response = requests.post(CLASSIFIER_URL, json={
-            'sequence_to_classify': input_prompt,
-            'candidate_labels': list(BOOKS_MAP.values())
-        })
-        topic_classifier_data = response.json()
-        topic_classifier_output = topic_classifier_data['label']
+        topic_classifier_output = classify(
+            input_prompt,
+            list(BOOKS_MAP.values())
+        )
         print(topic_classifier_output)
         books = [topic_classifier_output]
 
@@ -179,6 +177,6 @@ def chat():
 
 
 if __name__ == '__main__':
-    # classifier = pipeline("zero-shot-classification", model="MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli")
-    classifier = pipeline("zero-shot-classification", model="MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli")
+    classifier = pipeline("zero-shot-classification", model="MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli")
+    # classifier = pipeline("zero-shot-classification", model="MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli")
     app.run(debug=True, host='0.0.0.0', port=5000)
