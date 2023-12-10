@@ -332,6 +332,42 @@ def plot_generator():
     }
     plot_data['response_distribution'] = response_distribution
 
+    cursor.execute("""
+                   SELECT solar_documents_return_count, COUNT(*) as Frequency
+                    FROM conversation_logs
+                    GROUP BY solar_documents_return_count;
+                   """)
+    book_ids = []
+    counts = []
+
+    for row in cursor.fetchall():
+        book_ids.append(row[0])
+        counts.append(row[1])
+
+    solr_documents_distribution_across_books = {
+        'data': [{'x': book_ids, 'y': counts, 'type': 'bar'}],
+        'layout': {'title': 'Solr distribution across Books'}
+    }
+
+    plot_data['solr_documents_distribution_across_booksistribution'] = solr_documents_distribution_across_books
+
+    cursor.execute("""
+                   SELECT AVG(SumOfDocuments) as AvgDocumentsPerConversation
+                    FROM (
+                        SELECT conversation_id, SUM(solar_documents_return_count) as SumOfDocuments
+                        FROM conversation_logs
+                        GROUP BY conversation_id
+                    ) as SubQuery;
+                   """)
+
+    plot_data['average_number_of_solr_documents_fetched_in_a_session'] = cursor.fetchall()[0][0]
+
+    cursor.execute("""
+                   SELECT COUNT(DISTINCT conversation_id) as TotalUniqueConversations
+                    FROM conversation_logs;
+                   """)
+    plot_data['total_number_of_sessions'] = cursor.fetchall()[0][0]
+
     conn.close()
     return jsonify(plot_data)
 
