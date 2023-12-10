@@ -233,7 +233,7 @@ function ChatMessage(props) {
   const messageClass = bot ? 'received': 'sent';
 
   let title = "";
-  if (bot) title = chitChat ? "ChitChat": "Novels";
+  if (bot) title = chitChat ? "ChitChat": "RAG";
 
   return (<>
     <div className={`message ${messageClass}`}>
