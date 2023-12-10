@@ -99,6 +99,8 @@ def classify(sequence_to_classify, candidate_labels, multi_label=None):
     if not multi_label:
         labels = result['labels']
         scores = result['scores']
+        print(labels)
+        print(scores)
         return labels[np.argmax(scores)]
     else:
         return []
