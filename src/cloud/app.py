@@ -47,7 +47,8 @@ def pre_processing(paragraph):
     text = text.replace('-', " ")
     text = text.replace('\n', "")
     stop = set(nltk.corpus.stopwords.words('english') + list(string.punctuation))
-    filtered_words = [i.lower().strip() for i in nltk.word_tokenize(text) if i not in stop]
+    filtered_words = text.lower().split()
+    filtered_words = [word for word in filtered_words if word not in stop]
     lemmatizer = nltk.stem.WordNetLemmatizer()
     lemmatized_words = [lemmatizer.lemmatize(word) for word in filtered_words]
     para = ' '.join(lemmatized_words)
@@ -85,15 +86,6 @@ def search_results(books, query):
 
 
 def classify(sequence_to_classify, candidate_labels, multi_label=None):
-    # response = requests.post(CLASSIFIER_URL, json={
-    #     'sequence_to_classify': input_prompt,
-    #     'candidate_labels': [CHAT_VAL, NOVELS_VAL, FAREWELL_VAL]
-    # })
-    #
-    # classifier_data = response.json()
-    #
-    # classifier_output = classifier_data['label']
-
     result = classifier(sequence_to_classify, candidate_labels, multi_label=multi_label)
 
     if not multi_label:
