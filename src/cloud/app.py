@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from transformers import pipeline
 
 import nltk
 import string
 import pandas as pd
+import numpy as np
 import requests
 
 nltk.download('stopwords')
@@ -82,6 +84,26 @@ def search_results(books, query):
         return pd.DataFrame()
 
 
+def classify(sequence_to_classify, candidate_labels, multi_label=None):
+    # response = requests.post(CLASSIFIER_URL, json={
+    #     'sequence_to_classify': input_prompt,
+    #     'candidate_labels': [CHAT_VAL, NOVELS_VAL, FAREWELL_VAL]
+    # })
+    #
+    # classifier_data = response.json()
+    #
+    # classifier_output = classifier_data['label']
+
+    result = classifier(sequence_to_classify, candidate_labels, multi_label=multi_label)
+
+    if not multi_label:
+        labels = result['labels']
+        scores = result['scores']
+        return labels[np.argmax(scores)]
+    else:
+        return []
+
+
 @app.route('/chat', methods=['POST'])
 def chat():
     # Extract data from request
@@ -92,15 +114,11 @@ def chat():
     books = data['books']
     prev_msgs = data['prev_msgs']
     print(books)
-    response = requests.post(CLASSIFIER_URL, json={
-        'sequence_to_classify': input_prompt,
-        'candidate_labels': [CHAT_VAL, NOVELS_VAL, FAREWELL_VAL]
-    })
 
-    classifier_data = response.json()
-
-    classifier_output = classifier_data['label']
-    print(classifier_output)
+    classifier_output = classify(
+        input_prompt,
+        [CHAT_VAL, NOVELS_VAL, FAREWELL_VAL]
+    )
 
     if classifier_output != NOVELS_VAL:
         response = requests.post(CHITCHAT_URL, json={
@@ -160,4 +178,6 @@ def chat():
 
 
 if __name__ == '__main__':
+    # classifier = pipeline("zero-shot-classification", model="MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli")
+    classifier = pipeline("zero-shot-classification", model="MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli")
     app.run(debug=True, host='0.0.0.0', port=5000)
