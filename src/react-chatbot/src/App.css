@@ -56,6 +56,22 @@ body {
   padding: 5px;
 }
 
+.analytics-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 1fr 0.2fr 1fr;
+  gap: 16px;
+  height: 90vh;
+  margin-top: 10vh;
+  max-width: 1092px;
+}
+
+.analytics-item {
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+  padding: 16px;
+}
+
 main {
   height: 75vh;
   margin: 10vh 0 15vh;
@@ -105,6 +121,11 @@ form button {
 }
 
 .checkbox-label {
+  color: white;
+  font-size: 1rem;
+}
+
+.analytics-label {
   color: white;
   font-size: 1rem;
 }

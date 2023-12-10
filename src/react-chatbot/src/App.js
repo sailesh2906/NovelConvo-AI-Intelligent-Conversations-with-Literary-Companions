@@ -4,74 +4,16 @@ import axios from 'axios';
 
 import './App.css';
 
+import Analytics from './Analytics';
 import manImage from './man.png';
 import botImage from './bot.png';
 import sendImage from './send.png';
 import analyticsImage from './analytics.png';
 
-import SimpleHistogram from './SimpleHistogram';
+
 import generateSessionId from './util';
 
-
-const CLOUD_URL = 'http://34.125.179.216:5000'
-
-const CHAT_ENDPOINT = '/chat'
-const ANALYTICS_ENDPOINT = '/analytics'
-
-const PREV_MSG_COUNT = 5;
-
-const INIT_BOOKS = [
-  {
-    'bookId': 0,
-    'bookName': "The Adventures of Sherlock Holmes",
-    'checked': false
-  },
-  {
-    'bookId': 1,
-    'bookName': "Romeo and Juliet",
-    'checked': false
-  },
-  {
-    'bookId': 2,
-    'bookName': "The Iliad",
-    'checked': false
-  },
-  {
-    'bookId': 3,
-    'bookName': "Gulliver's Travels",
-    'checked': false
-  },
-  {
-    'bookId': 4,
-    'bookName': "Moby Dick",
-    'checked': false
-  },
-  {
-    'bookId': 5,
-    'bookName': "Hervey Willetts",
-    'checked': false
-  },
-  {
-    'bookId': 6,
-    'bookName': "Babbitt",
-    'checked': false
-  },
-  {
-    'bookId': 7,
-    'bookName': "Dracula",
-    'checked': false
-  },
-  {
-    'bookId': 8,
-    'bookName': "Adventures of Huckleberry Finn",
-    'checked': false
-  },
-  {
-    'bookId': 9,
-    'bookName': "The Alchemist",
-    'checked': false
-  }
-]
+import { CLOUD_URL, INIT_BOOKS, CHAT_ENDPOINT, PREV_MSG_COUNT } from './constants';
 
 function App() {
   const [chatMode, setChatMode] = useState(true);
@@ -95,33 +37,6 @@ function App() {
       </section>
     </div>
   );
-}
-
-function Analytics() {
-  const analytics_url = CLOUD_URL + ANALYTICS_ENDPOINT;
-  const [analytics, setAnalytics] = useState({});
-
-
-  // const fetchAnalytics = async (e) => {
-  //   try {
-  //     const response = await axios.get(analytics_url);
-  //     setAnalytics();
-  //     setWaitForResponse((waitForResponse) => !waitForResponse)
-  //     setMsgCounter((msgCounter) => (msgCounter += 1))
-      
-  //     if (response.data.farewell) {
-  //       setSessionEnded(true)
-  //     }
-  //   } catch (error) {
-  //     console.error('Error sending message:', error);
-  //   }
-  // }
-
-  return(
-    <>
-     <SimpleHistogram/>
-    </>
-  )
 }
 
 function ChatRoom({ sessionId }) {

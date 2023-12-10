@@ -222,6 +222,7 @@ def chat():
     })
 
     if response.status_code != 200:
+        print(response.status_code)
         return jsonify(service_down_error(False))
 
     rag_data = response.json()
