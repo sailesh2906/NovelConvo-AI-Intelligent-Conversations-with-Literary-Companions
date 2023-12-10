@@ -103,67 +103,60 @@ def chat():
     print(classifier_output)
 
     if classifier_output != NOVELS_VAL:
-        # response = requests.post(CLASSIFIER_URL, json={
-        #     'sequence_to_classify': input_prompt,
-        #     'candidate_labels': ['farewell', 'not farewell']
-        # })
-        # farewell_data = response.json()
-        # farewell_output = farewell_data['label']
-        #
-        # print(farewell_output)
-
         response = requests.post(CHITCHAT_URL, json={
             'prompt': input_prompt,
         })
         cc_data = response.json()
-        return jsonify({
-            'output': cc_data['output'],
-            'farewell': classifier_output == FAREWELL_VAL,
-            'chit_chat': True
-        })
-    else:
-        if not books:
-            print(list(BOOKS_MAP.values()))
-            response = requests.post(CLASSIFIER_URL, json={
-                'sequence_to_classify': input_prompt,
-                'candidate_labels': list(BOOKS_MAP.values())
-            })
-            topic_classifier_data = response.json()
-            topic_classifier_output = topic_classifier_data['label']
-            print(topic_classifier_output)
-            books = [topic_classifier_output]
 
-        preprocessed_input = pre_processing(input_prompt)
-
-        res = search_results([BOOKS_MAP[0]], preprocessed_input)
-        print("results here")
-        print(res)
-        if res.empty:
-            jsonify({
-                'output': "No results found!! Try again",
-                'farewell': False,
-                'chit_chat': False
+        if not cc_data['redirect']:
+            return jsonify({
+                'output': cc_data['output'],
+                'farewell': classifier_output == FAREWELL_VAL,
+                'chit_chat': True
             })
 
-        doc_string = ''
-
-        for msg in prev_msgs:
-            doc_string += (msg + ' /n ')
-
-        for i in range(5):
-            doc_string += (res.paragraph[i] + ' /n ')
-
-        response = requests.post(RAG_URL, json={
-            'query': input_prompt,
-            'docs': doc_string
+    if not books:
+        print(list(BOOKS_MAP.values()))
+        response = requests.post(CLASSIFIER_URL, json={
+            'sequence_to_classify': input_prompt,
+            'candidate_labels': list(BOOKS_MAP.values())
         })
-        print(response.status_code)
-        rag_data = response.json()
-        return jsonify({
-            'output': rag_data['answer'],
+        topic_classifier_data = response.json()
+        topic_classifier_output = topic_classifier_data['label']
+        print(topic_classifier_output)
+        books = [topic_classifier_output]
+
+    preprocessed_input = pre_processing(input_prompt)
+
+    res = search_results(books, preprocessed_input)
+    print("results here")
+    print(res)
+    if res.empty:
+        jsonify({
+            'output': "No results found!! Try again",
             'farewell': False,
             'chit_chat': False
         })
+
+    doc_string = ''
+
+    for msg in prev_msgs:
+        doc_string += (msg + ' /n ')
+
+    for i in range(5):
+        doc_string += (res.paragraph[i] + ' /n ')
+
+    response = requests.post(RAG_URL, json={
+        'query': input_prompt,
+        'docs': doc_string
+    })
+    print(response.status_code)
+    rag_data = response.json()
+    return jsonify({
+        'output': rag_data['answer'],
+        'farewell': False,
+        'chit_chat': False
+    })
 
 
 if __name__ == '__main__':

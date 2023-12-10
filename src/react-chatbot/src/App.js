@@ -191,11 +191,12 @@ function ChatRoom() {
   }
 
   const placeholder = sessionEnded ? "Session Ended!! Bye" : "wanna talk books"
-  return (<div class="flex-container">
+  return (
+  <div class="flex-container">
     <div class="flex-child filters">
       {books.map(book => <Checkbox key={`checkbox_book_${book.bookId}`} label={book.bookName} isChecked={book.checked} onChange={() => onToggleCheck(book.bookId)}/>)}
     </div>
-    <div class="flex-child main">
+    <div class="flex-child chat">
       <main>
 
         {messages && messages.map(msg => (
