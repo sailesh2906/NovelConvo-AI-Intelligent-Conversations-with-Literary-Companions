@@ -97,6 +97,14 @@ def classify(sequence_to_classify, candidate_labels, multi_label=None):
         return []
 
 
+def service_down_error(chit_chat):
+    return {
+        'output': "Service Down!!",
+        'farewell': True,
+        'chit-chat': chit_chat
+    }
+
+
 @app.route('/chat', methods=['POST'])
 def chat():
     # Extract data from request
@@ -119,8 +127,11 @@ def chat():
         response = requests.post(CHITCHAT_URL, json={
             'prompt': input_prompt,
         })
-        cc_data = response.json()
 
+        if response.status_code != 200:
+            return jsonify(service_down_error(True))
+
+        cc_data = response.json()
         if not cc_data['redirect']:
             return jsonify({
                 'output': cc_data['output'],
@@ -128,13 +139,13 @@ def chat():
                 'chit_chat': True
             })
 
-    book_titles = []
+    topic_classifier_output = classify(
+        input_prompt,
+        list(BOOKS_MAP.values())
+    )
+    print(topic_classifier_output)
+
     if not books:
-        topic_classifier_output = classify(
-            input_prompt,
-            list(BOOKS_MAP.values())
-        )
-        print(topic_classifier_output)
         book_titles = [topic_classifier_output]
     else:
         book_titles = [BOOKS_MAP[book] for book in books]
@@ -146,8 +157,8 @@ def chat():
 
     doc_string = ''
 
-    # for msg in prev_msgs:
-    #     doc_string += (msg + ' /n ')
+    for msg in prev_msgs:
+        doc_string += (msg + ' /n ')
 
     if books and doc_df.empty:
         return jsonify({
@@ -165,6 +176,9 @@ def chat():
         'docs': doc_string
     })
 
+    if response.status_code != 200:
+        return jsonify(service_down_error(False))
+
     rag_data = response.json()
 
     return jsonify({
@@ -176,5 +190,4 @@ def chat():
 
 if __name__ == '__main__':
     classifier = pipeline("zero-shot-classification", model="MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli")
-    # classifier = pipeline("zero-shot-classification", model="MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli")
     app.run(debug=True, host='0.0.0.0', port=5000)
