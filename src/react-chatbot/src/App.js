@@ -10,6 +10,9 @@ import sendImage from './send.png';
 import analyticsImage from './analytics.png';
 
 import SimpleHistogram from './SimpleHistogram';
+import generateSessionId from './util';
+
+
 const LOCAL_URL = 'http://localhost:5000/chat';
 const CLOUD_URL = 'http://34.125.179.216:5000/chat';
 
@@ -70,10 +73,12 @@ const INIT_BOOKS = [
 
 function App() {
   const [chatMode, setChatMode] = useState(true);
-
+  
   const toggleChatMode = () => {
     setChatMode((chatMode) => !chatMode)
   };
+
+  const sessionId = generateSessionId();
   return (
     <div className="App">
       <header className="App-header">
@@ -84,13 +89,40 @@ function App() {
       </header>
 
       <section>
-        {chatMode ? <ChatRoom /> : <Analytics />}
+        {chatMode ? <ChatRoom sessionId={sessionId}/> : <Analytics />}
       </section>
     </div>
   );
 }
 
 function Analytics() {
+  // const sendMessage = async (e) => {
+  //   try {
+  //     const response = await axios.post(cloud_url, {
+  //       prompt: formValue,
+  //       books: getBooksToSend(),
+  //       prev_msgs: getPrevMessages(),
+  //       conversation_id: sessionId
+  //     });
+  //     addMessage((messages) => ([
+  //       ...messages,
+  //       {
+  //         text: response.data.output,
+  //         bot: true,
+  //         id: msgCounter + 1,
+  //         chitChat : response.data.chit_chat
+  //       }
+  //     ]));
+  //     setWaitForResponse((waitForResponse) => !waitForResponse)
+  //     setMsgCounter((msgCounter) => (msgCounter += 1))
+      
+  //     if (response.data.farewell) {
+  //       setSessionEnded(true)
+  //     }
+  //   } catch (error) {
+  //     console.error('Error sending message:', error);
+  //   }
+  // }
 
   return(
     <>
@@ -99,7 +131,7 @@ function Analytics() {
   )
 }
 
-function ChatRoom() {
+function ChatRoom({ sessionId }) {
   const dummy = useRef();
 
   const [formValue, setFormValue] = useState('');
@@ -122,7 +154,8 @@ function ChatRoom() {
       const response = await axios.post(cloud_url, {
         prompt: formValue,
         books: getBooksToSend(),
-        prev_msgs: getPrevMessages()
+        prev_msgs: getPrevMessages(),
+        conversation_id: sessionId
       });
       addMessage((messages) => ([
         ...messages,
