@@ -249,12 +249,11 @@ def plot_generator():
     # Generate Timeseries Plot
     cursor.execute('SELECT timestamp FROM conversation_logs')
     timestamps = [datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S.%f') for row in cursor.fetchall()]
-    conversations_per_minute = Counter([timestamp.replace(second=0, microsecond=0) for timestamp in timestamps])
+    conversations_per_hour = Counter([timestamp.replace(minute=0, second=0, microsecond=0) for timestamp in timestamps])
 
     # Prepare data for plotting
-    times = list(conversations_per_minute.keys())
-    counts = list(conversations_per_minute.values())
-
+    times = list(conversations_per_hour.keys())
+    counts = list(conversations_per_hour.values())
     # Plotly data
     conversations_over_time = {
         'data': [{'x': times, 'y': counts, 'type': 'timeseries'}],
