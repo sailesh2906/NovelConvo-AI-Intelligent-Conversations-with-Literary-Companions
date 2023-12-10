@@ -7,6 +7,9 @@ import string
 import pandas as pd
 import numpy as np
 import requests
+import sqlite3
+from datetime import datetime
+from collections import Counter
 
 nltk.download('stopwords')
 nltk.download('punkt')
@@ -117,6 +120,17 @@ def append_prev_messages(prompt, prev_msgs=None):
     return return_prompt
 
 
+def insert_conversation_in_db(data):
+    conn = sqlite3.connect('metadata.sqlite')
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO conversation_logs (timestamp, conversation_id, prompt, response, original_book_id, predicted_book_id, response_type, solar_documents_return_count) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', [data['timestamp'], data['conversation_id'], data['prompt'], data['response'], data['original_book_id'], data['predicted_book_id'], data['response_type'], data['solar_documents_return_count']])
+    conn.commit()
+    conn.close()
+
+
 @app.route('/chat', methods=['POST'])
 def chat():
     # Extract data from request
@@ -127,6 +141,17 @@ def chat():
     books = data['books']
     prev_msgs = data['prev_msgs']
     print(books)
+
+    analytics_data = {
+        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'),
+        'conversation_id': data['conversation_id'],
+        'prompt': input_prompt,
+        'response': '',
+        'original_book_id': books[0] if books else None,
+        'predicted_book_id': None,
+        'response_type': '',
+        'solar_documents_return_count': None
+    }
 
     classifier_output = classify(
         input_prompt,
@@ -145,6 +170,9 @@ def chat():
 
         cc_data = response.json()
         if not cc_data['redirect']:
+            analytics_data['response'] = cc_data['output']
+            analytics_data['response_type'] = 'chat'
+            insert_conversation_in_db(analytics_data)
             return jsonify({
                 'output': cc_data['output'],
                 'farewell': classifier_output == FAREWELL_VAL,
@@ -156,6 +184,8 @@ def chat():
         list(BOOKS_MAP.values())
     )
     print(topic_classifier_output)
+
+    predicted_book_id = [i for i in BOOKS_MAP if BOOKS_MAP[i] == topic_classifier_output][0]
 
     if not books:
         book_titles = [topic_classifier_output]
@@ -171,6 +201,11 @@ def chat():
 
     doc_string = append_prev_messages(doc_string, prev_msgs)
     if books and doc_df.empty:
+        analytics_data['response'] = "No results found!! Try changing filters"
+        analytics_data['response_type'] = 'novels'
+        analytics_data['solar_documents_return_count'] = 0
+        analytics_data['predicted_book_id'] = predicted_book_id
+        insert_conversation_in_db(analytics_data)
         return jsonify({
             'output': "No results found!! Try changing filters",
             'farewell': False,
@@ -191,11 +226,110 @@ def chat():
 
     rag_data = response.json()
 
+    analytics_data['response'] = rag_data['answer']
+    analytics_data['response_type'] = 'novels'
+    analytics_data['solar_documents_return_count'] = doc_df.shape[0]
+    analytics_data['predicted_book_id'] = predicted_book_id
+    insert_conversation_in_db(analytics_data)
     return jsonify({
         'output': rag_data['answer'],
         'farewell': False,
         'chit_chat': False
     })
+
+
+@app.route('/plot_generator', methods=['GET'])
+def plot_generator():
+    plot_data = {}
+
+    conn = sqlite3.connect('metadata.sqlite')
+    cursor = conn.cursor()
+
+    # Generate Timeseries Plot
+    cursor.execute('SELECT timestamp FROM conversation_logs')
+    timestamps = [datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S.%f') for row in cursor.fetchall()]
+    conversations_per_minute = Counter([timestamp.replace(second=0, microsecond=0) for timestamp in timestamps])
+
+    # Prepare data for plotting
+    times = list(conversations_per_minute.keys())
+    counts = list(conversations_per_minute.values())
+
+    # Plotly data
+    conversations_over_time = {
+        'data': [{'x': times, 'y': counts, 'type': 'timeseries'}],
+        'layout': {'title': 'Conversations Over Time'}
+    }
+    plot_data['conversations_over_time'] = conversations_over_time
+
+    # Average Number of Conversations Per Session
+    cursor.execute("""
+        SELECT AVG(conversation_count) AS average_conversations_per_id
+        FROM (
+            SELECT conversation_id, COUNT(*) AS conversation_count
+            FROM conversation_logs
+            GROUP BY conversation_id
+        ) AS subquery;
+    """)
+    plot_data['average_number_of_conversations_in_a_session'] = cursor.fetchall()[0][0]
+
+    # Book Distribution
+    cursor.execute('''
+        SELECT original_book_id, COUNT(*) as count
+        FROM conversation_logs
+        WHERE original_book_id IS NOT NULL
+        GROUP BY original_book_id
+        ORDER BY count DESC;
+    ''')
+    book_ids = []
+    counts = []
+    for row in cursor.fetchall():
+        book_ids.append(row[0])
+        counts.append(row[1])
+
+    book_distribution = {
+        'data': [{'x': book_ids, 'y': counts, 'type': 'bar'}],
+        'layout': {'title': 'Book Distribution'}
+    }
+    plot_data['book_distribution'] = book_distribution
+
+    # Calculate Accuracy
+    cursor.execute("""
+        SELECT COUNT(*) FROM conversation_logs
+        WHERE original_book_id IS NOT NULL AND original_book_id = predicted_book_id;
+    """)
+    matched = cursor.fetchall()[0][0]
+
+    cursor.execute("""
+        SELECT COUNT(*) FROM conversation_logs
+        WHERE original_book_id IS NOT NULL;
+    """)
+    total = cursor.fetchall()[0][0]
+
+    book_classifier_accuracy = matched / total
+    plot_data['book_classifier_accuracy'] = book_classifier_accuracy
+
+    # Response Type Distribution
+    cursor.execute("""
+        SELECT response_type, COUNT(*) as count
+        FROM conversation_logs
+        GROUP BY response_type
+        ORDER BY count DESC;
+    """)
+    rows = cursor.fetchall()
+    response_types = []
+    counts = []
+    for row in rows:
+        response_types.append(row[0])
+        counts.append(row[1])
+
+    response_distribution = {
+        'data': [{'x': response_types, 'y': counts, 'type': 'bar'}],
+        'layout': {'title': 'Response Distribution'}
+    }
+    plot_data['response_distribution'] = response_distribution
+
+    conn.close()
+    return jsonify(plot_data)
 
 
 if __name__ == '__main__':
