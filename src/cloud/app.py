@@ -105,6 +105,18 @@ def service_down_error(chit_chat):
     }
 
 
+def append_prev_messages(prompt, prev_msgs=None):
+    return_prompt = prompt
+
+    if not prev_msgs:
+        return prompt
+
+    for msg in prev_msgs:
+        return_prompt += (msg + ' /n ')
+
+    return return_prompt
+
+
 @app.route('/chat', methods=['POST'])
 def chat():
     # Extract data from request
@@ -140,7 +152,7 @@ def chat():
             })
 
     topic_classifier_output = classify(
-        input_prompt,
+        append_prev_messages(input_prompt, prev_msgs),
         list(BOOKS_MAP.values())
     )
     print(topic_classifier_output)
@@ -157,9 +169,7 @@ def chat():
 
     doc_string = ''
 
-    for msg in prev_msgs:
-        doc_string += (msg + ' /n ')
-
+    doc_string = append_prev_messages(doc_string, prev_msgs)
     if books and doc_df.empty:
         return jsonify({
             'output': "No results found!! Try changing filters",
