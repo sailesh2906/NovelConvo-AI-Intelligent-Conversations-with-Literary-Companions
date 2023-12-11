@@ -10,7 +10,13 @@ import sendImage from './send.png';
 import { CLOUD_URL, INIT_BOOKS, CHAT_ENDPOINT, PREV_MSG_COUNT } from './constants';
 
 
-function ChatRoom({ sessionId, messages, addMessage }) {
+function ChatRoom({ 
+  sessionId,
+  messages,
+  addMessage,
+  sessionEnded,
+  setSessionEnded 
+}) {
     const dummy = useRef();
   
     const [formValue, setFormValue] = useState('');
