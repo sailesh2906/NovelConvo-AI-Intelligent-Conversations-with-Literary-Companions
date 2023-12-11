@@ -64,17 +64,17 @@ function Analytics() {
         </div>
         <div className='analytics-item'>
             <label className="analytics-label">
-                {`Average Conversations per Session: ${analytics && analytics.average_number_of_conversations_in_a_session}`}
+                {`Average Conversations per Session: ${analytics && Math.round(analytics.average_number_of_conversations_in_a_session* 100) / 100}`}
             </label>
         </div>
         <div className='analytics-item'>
             <label className="analytics-label">
-                {`Book Classifier Accuracy: ${analytics && analytics.book_classifier_accuracy}`}
+                {`Book Classifier Accuracy: ${analytics && Math.round(analytics.book_classifier_accuracy* 100) / 100}`}
             </label>
         </div> 
         <div className='analytics-item'>
             <label className="analytics-label">
-                {`Average Solr Docs Retrieved per Session: ${analytics && analytics.average_number_of_solr_documents_fetched_in_a_session}`}
+                {`Average Solr Docs Retrieved per Session: ${analytics && Math.round(analytics.average_number_of_solr_documents_fetched_in_a_session* 100) / 100}`}
             </label>
         </div>
         <div className='analytics-item'>
