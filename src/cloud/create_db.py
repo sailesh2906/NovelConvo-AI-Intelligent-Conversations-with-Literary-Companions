@@ -2,9 +2,9 @@ import sqlite3
 conn = sqlite3.connect('metadata.sqlite')
 cursor = conn.cursor()
 
-
 cursor.execute('''
-    CREATE TABLE IF NOT EXISTS conversation_logs (
+    CREATE TABLE IF NOT EXISTS message_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         timestamp TEXT PRIMARY KEY,
         conversation_id TEXT,
         prompt TEXT,

@@ -124,7 +124,7 @@ def insert_conversation_in_db(data):
     conn = sqlite3.connect('metadata.sqlite')
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO conversation_logs (timestamp, conversation_id, prompt, response, original_book_id, predicted_book_id, response_type, solar_documents_return_count) 
+        INSERT INTO message_logs (timestamp, conversation_id, prompt, response, original_book_id, predicted_book_id, response_type, solar_documents_return_count) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ''', [data['timestamp'], data['conversation_id'], data['prompt'], data['response'], data['original_book_id'], data['predicted_book_id'], data['response_type'], data['solar_documents_return_count']])
     conn.commit()
@@ -254,7 +254,7 @@ def plot_generator():
     cursor = conn.cursor()
 
     # Generate Timeseries Plot
-    cursor.execute('SELECT timestamp FROM conversation_logs')
+    cursor.execute('SELECT timestamp FROM message_logs')
     timestamps = [datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S.%f') for row in cursor.fetchall()]
     conversations_per_hour = Counter([timestamp.replace(minute=0, second=0, microsecond=0) for timestamp in timestamps])
 
@@ -273,7 +273,7 @@ def plot_generator():
         SELECT AVG(conversation_count) AS average_conversations_per_id
         FROM (
             SELECT conversation_id, COUNT(*) AS conversation_count
-            FROM conversation_logs
+            FROM message_logs
             GROUP BY conversation_id
         ) AS subquery;
     """)
@@ -282,7 +282,7 @@ def plot_generator():
     # Book Distribution
     cursor.execute('''
         SELECT original_book_id, COUNT(*) as count
-        FROM conversation_logs
+        FROM message_logs
         WHERE original_book_id IS NOT NULL
         GROUP BY original_book_id
         ORDER BY count DESC;
@@ -301,14 +301,14 @@ def plot_generator():
 
     # Calcualte Accuracy
     cursor.execute("""
-                    SELECT COUNT(*) FROM conversation_logs
+                    SELECT COUNT(*) FROM message_logs
                     WHERE original_book_id IS NOT NULL AND predicted_book_id IS NOT NULL AND original_book_id = predicted_book_id;
                     """)
 
     matched = cursor.fetchall()[0][0]
 
     cursor.execute("""
-                    SELECT COUNT(*) FROM conversation_logs
+                    SELECT COUNT(*) FROM message_logs
                     WHERE original_book_id IS NOT NULL AND predicted_book_id IS NOT NULL;
                     """)
     total = cursor.fetchall()[0][0]
@@ -322,7 +322,7 @@ def plot_generator():
     # Response Type Distribution
     cursor.execute("""
         SELECT response_type, COUNT(*) as count
-        FROM conversation_logs
+        FROM message_logs
         GROUP BY response_type
         ORDER BY count DESC;
     """)
@@ -341,7 +341,7 @@ def plot_generator():
 
     cursor.execute("""
                     SELECT original_book_id, SUM(solar_documents_return_count) as Frequency
-                        FROM conversation_logs
+                        FROM message_logs
                         WHERE original_book_id IS NOT NULL
                         GROUP BY original_book_id;
                    """)
@@ -363,7 +363,7 @@ def plot_generator():
                    SELECT AVG(SumOfDocuments) as AvgDocumentsPerConversation
                     FROM (
                         SELECT conversation_id, SUM(solar_documents_return_count) as SumOfDocuments
-                        FROM conversation_logs
+                        FROM message_logs
                         GROUP BY conversation_id
                     ) as SubQuery;
                    """)
@@ -372,7 +372,7 @@ def plot_generator():
 
     cursor.execute("""
                    SELECT COUNT(DISTINCT conversation_id) as TotalUniqueConversations
-                    FROM conversation_logs;
+                    FROM message_logs;
                    """)
     plot_data['total_number_of_sessions'] = cursor.fetchall()[0][0]
 
