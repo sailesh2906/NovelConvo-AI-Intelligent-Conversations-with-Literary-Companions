@@ -201,7 +201,7 @@ def chat():
             if not doc_df.empty:
                 doc_dfs_map[book] = doc_df
 
-    doc_string = ''
+    doc_string = '/n'
 
     doc_string = append_prev_messages(doc_string, prev_msgs)
     if books and not doc_dfs_map:
@@ -222,7 +222,7 @@ def chat():
     print(doc_string)
     response = requests.post(RAG_URL, json={
         'query': input_prompt,
-        'docs': doc_string
+        'docs': doc_string,
     })
 
     if response.status_code != 200:

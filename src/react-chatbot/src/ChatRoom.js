@@ -16,8 +16,8 @@ function ChatRoom({ sessionId, messages, addMessage }) {
     const [formValue, setFormValue] = useState('');
     const [books, setBooks] = useState(INIT_BOOKS)
     let [msgCounter, setMsgCounter] = useState(0);
-    const [sessionEnded, setSessionEnded] = useState(false);
     const [waitForResponse, setWaitForResponse] = useState(false);
+
   
     useEffect(() => {
       dummy.current.scrollIntoView({ behavior: 'smooth' });
@@ -51,6 +51,17 @@ function ChatRoom({ sessionId, messages, addMessage }) {
           setSessionEnded(true)
         }
       } catch (error) {
+        addMessage((messages) => ([
+          ...messages,
+          {
+            text: "Cloud Service Down",
+            bot: true,
+            id: msgCounter + 1,
+            chitChat : false
+          }
+        ]));
+        setWaitForResponse((waitForResponse) => !waitForResponse)
+        setMsgCounter((msgCounter) => (msgCounter += 1))
         console.error('Error sending message:', error);
       }
     }
