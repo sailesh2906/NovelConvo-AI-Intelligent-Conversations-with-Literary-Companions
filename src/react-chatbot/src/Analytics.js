@@ -15,7 +15,9 @@ function Analytics() {
     const [analytics, setAnalytics] = useState(false);
   
     useEffect(()  => {
-      fetchAnalytics();
+      if (!analytics) {
+        fetchAnalytics();
+      }
     }, []);
   
     const fetchAnalytics = async () => {
