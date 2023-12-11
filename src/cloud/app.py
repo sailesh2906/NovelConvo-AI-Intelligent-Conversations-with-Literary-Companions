@@ -187,24 +187,24 @@ def chat():
 
     predicted_book_id = [i for i in BOOKS_MAP if BOOKS_MAP[i] == topic_classifier_output][0]
 
-    if not books:
-        book_titles = [topic_classifier_output]
-    else:
-        book_titles = [BOOKS_MAP[book] for book in books]
-
     preprocessed_input = pre_processing(input_prompt)
 
-    doc_dfs = []
-    print(book_titles)
-    for book in book_titles:
-        doc_df = search_results([book], preprocessed_input)
-        print(doc_df)
-        doc_dfs.append(doc_dfs)
+    doc_dfs_map = {}
+    if not books:
+        book_titles = [topic_classifier_output]
+        doc_df = search_results(book_titles, preprocessed_input)
+        if not doc_df.empty:
+            doc_dfs_map[predicted_book_id] = doc_df
+    else:
+        for book in books:
+            doc_df = search_results([BOOKS_MAP[book]], preprocessed_input)
+            if not doc_df.empty:
+                doc_dfs_map[book] = doc_df
 
     doc_string = ''
 
     doc_string = append_prev_messages(doc_string, prev_msgs)
-    if books and all([doc_df.empty for doc_df in doc_dfs]):
+    if books and not doc_dfs_map:
         analytics_data['response'] = "No results found!! Try changing filters"
         analytics_data['response_type'] = 'novels'
         analytics_data['solar_documents_return_count'] = 0
@@ -216,10 +216,9 @@ def chat():
             'chit_chat': False
         })
 
-    for doc_df in doc_dfs:
-        if not doc_df.empty:
-            for i in range(min(5, doc_df.shape[0])):
-                doc_string += (doc_df.paragraph[i] + ' /n ')
+    for book, doc_df in doc_dfs_map.items():
+        for i in range(min(5, doc_df.shape[0])):
+            doc_string += (doc_df.paragraph[i] + ' /n ')
 
     response = requests.post(RAG_URL, json={
         'query': input_prompt,
@@ -235,10 +234,11 @@ def chat():
     analytics_data['response'] = rag_data['answer']
     analytics_data['response_type'] = 'novels'
     analytics_data['predicted_book_id'] = predicted_book_id
-    for i, doc_df in enumerate(doc_dfs):
-        analytics_data['original_book_id'] = books[i]
+    for book, doc_df in doc_dfs_map.items():
+        analytics_data['original_book_id'] = book
         analytics_data['solar_documents_return_count'] = doc_df.shape[0]
         insert_conversation_in_db(analytics_data)
+
     return jsonify({
         'output': rag_data['answer'],
         'farewell': False,
