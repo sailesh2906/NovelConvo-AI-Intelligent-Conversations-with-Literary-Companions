@@ -5,7 +5,7 @@ cursor = conn.cursor()
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS message_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        timestamp TEXT PRIMARY KEY,
+        timestamp TEXT,
         conversation_id TEXT,
         prompt TEXT,
         response TEXT,
