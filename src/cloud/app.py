@@ -194,13 +194,16 @@ def chat():
 
     preprocessed_input = pre_processing(input_prompt)
 
-    doc_df = search_results(book_titles, preprocessed_input)
-    print(doc_df)
+    doc_dfs = []
+    for book in book_titles:
+        doc_df = search_results([book], preprocessed_input)
+        print(doc_df)
+        doc_dfs.append(doc_dfs)
 
     doc_string = ''
 
     doc_string = append_prev_messages(doc_string, prev_msgs)
-    if books and doc_df.empty:
+    if books and all([doc_df.empty for doc_df in doc_dfs]):
         analytics_data['response'] = "No results found!! Try changing filters"
         analytics_data['response_type'] = 'novels'
         analytics_data['solar_documents_return_count'] = 0
@@ -212,9 +215,10 @@ def chat():
             'chit_chat': False
         })
 
-    if not doc_df.empty:
-        for i in range(min(5, doc_df.shape[0])):
-            doc_string += (doc_df.paragraph[i] + ' /n ')
+    for doc_df in doc_dfs:
+        if not doc_df.empty:
+            for i in range(min(5, doc_df.shape[0])):
+                doc_string += (doc_df.paragraph[i] + ' /n ')
 
     response = requests.post(RAG_URL, json={
         'query': input_prompt,
@@ -229,9 +233,11 @@ def chat():
 
     analytics_data['response'] = rag_data['answer']
     analytics_data['response_type'] = 'novels'
-    analytics_data['solar_documents_return_count'] = doc_df.shape[0]
     analytics_data['predicted_book_id'] = predicted_book_id
-    insert_conversation_in_db(analytics_data)
+    for i, doc_df in enumerate(doc_dfs):
+        analytics_data['original_book_id'] = books[i]
+        analytics_data['solar_documents_return_count'] = doc_df.shape[0]
+        insert_conversation_in_db(analytics_data)
     return jsonify({
         'output': rag_data['answer'],
         'farewell': False,
