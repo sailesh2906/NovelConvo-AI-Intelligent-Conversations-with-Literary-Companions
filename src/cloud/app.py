@@ -219,7 +219,7 @@ def chat():
     for book, doc_df in doc_dfs_map.items():
         for i in range(min(5, doc_df.shape[0])):
             doc_string += (doc_df.paragraph[i] + ' /n ')
-    print(doc_string)
+
     response = requests.post(RAG_URL, json={
         'query': input_prompt,
         'docs': doc_string,
