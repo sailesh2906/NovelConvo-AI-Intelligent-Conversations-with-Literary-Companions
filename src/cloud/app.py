@@ -195,6 +195,7 @@ def chat():
     preprocessed_input = pre_processing(input_prompt)
 
     doc_dfs = []
+    print(book_titles)
     for book in book_titles:
         doc_df = search_results([book], preprocessed_input)
         print(doc_df)
